@@ -24,11 +24,11 @@ public class UserController {
 	private UserService userService;
 
 	@PostMapping("add-user")
-	public ResponseEntity<String> addUser(@RequestBody UserDto userDto) {
+	public ResponseEntity<UserModel> addUser(@RequestBody UserDto userDto) {
 
-		userService.addUser(userDto);
+		UserModel userModel = userService.addUser(userDto);
 
-		return new ResponseEntity<String>("User added successfully", HttpStatus.OK);
+		return new ResponseEntity<UserModel>(userModel, HttpStatus.OK);
 	}
 
 	@GetMapping("users/{userId}")

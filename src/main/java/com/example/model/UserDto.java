@@ -1,7 +1,5 @@
 package com.example.model;
 
-import java.util.List;
-
 import lombok.Getter;
 
 @Getter
@@ -15,5 +13,4 @@ public class UserDto {
 
 	private String mobile;
 
-	private List<AddressDto> address;
 }

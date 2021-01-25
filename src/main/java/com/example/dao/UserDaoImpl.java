@@ -1,7 +1,6 @@
 package com.example.dao;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -14,24 +13,20 @@ import org.springframework.stereotype.Repository;
 
 import com.example.entity.User;
 import com.example.exception.CustomException;
-import com.example.model.UserModel;
 import com.example.repository.UserRepo;
-import com.example.util.Mapper;
 
 @Repository
 public class UserDaoImpl implements UserDao {
 
 	@Autowired
-	private Mapper mapper;
-
-	@Autowired
 	private UserRepo userRepo;
 
 	@Override
-	@CachePut(value = "user", key = "#user.getUserId()")
-	public UserModel saveUser(User user) {
+	@Caching(evict = { @CacheEvict(value = "usersList", allEntries = true), }, put = {
+			@CachePut(value = "user", key = "#user.getUserId()") })
+	public User saveUser(User user) {
 		try {
-			return mapper.convert(userRepo.save(user), UserModel.class);
+			return userRepo.save(user);
 		} catch (Exception e) {
 			throw new CustomException("Error while saving user", 500);
 		}
@@ -39,15 +34,9 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	@Cacheable(value = "user", key = "#userId")
-	public UserModel userById(Integer userId) {
+	public User userById(Integer userId) {
 
-		Optional<User> optional = userRepo.findByUserId(userId);
-		if (optional.isPresent()) {
-
-			return mapper.convert(optional.get(), UserModel.class);
-		} else {
-			throw new CustomException("User not found", 400);
-		}
+		return userRepo.findByUserId(userId).orElseThrow(() -> new CustomException("User not found", 400));
 	}
 
 	@Override
@@ -63,7 +52,7 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	@Cacheable(value = "usersList", key = "#page")
-	public List<UserModel> allUsers(Integer page) {
+	public List<User> allUsers(Integer page) {
 
 		Page<User> users = userRepo.findAll(PageRequest.of(--page, 5));
 
@@ -71,6 +60,6 @@ public class UserDaoImpl implements UserDao {
 			throw new CustomException("Users not found", 400);
 		}
 
-		return mapper.convertToList(users.getContent(), UserModel.class);
+		return users.getContent();
 	}
 }

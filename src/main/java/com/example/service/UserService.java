@@ -7,7 +7,7 @@ import com.example.model.UserModel;
 
 public interface UserService {
 
-	void addUser(UserDto userDto);
+	UserModel addUser(UserDto userDto);
 
 	UserModel getUser(Integer userId);
 

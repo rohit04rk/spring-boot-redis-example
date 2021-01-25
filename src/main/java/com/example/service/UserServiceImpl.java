@@ -21,16 +21,17 @@ public class UserServiceImpl implements UserService {
 	private Mapper mapper;
 
 	@Override
-	public void addUser(UserDto userDto) {
+	public UserModel addUser(UserDto userDto) {
 		User user = mapper.convert(userDto, User.class);
 
-		userDao.saveUser(user);
+		return mapper.convert(userDao.saveUser(user), UserModel.class);
 	}
 
 	@Override
 	public UserModel getUser(Integer userId) {
+		User user = userDao.userById(userId);
 
-		return userDao.userById(userId);
+		return mapper.convert(user, UserModel.class);
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserModel> allUsers(Integer page) {
-		
-		return userDao.allUsers(page);
+
+		return mapper.convertToList(userDao.allUsers(page), UserModel.class);
 	}
 }
